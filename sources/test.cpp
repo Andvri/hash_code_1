@@ -7,15 +7,24 @@
 
 using namespace std;
 
+struct lib_data {
+    int lib_number_of_books;
+    int signup;
+    int ship_days;
+    vector<int> lib_books;
+} typedef lib_data;
+
 int main() {
-    vector<string> books_libraries_days;
+    vector<string> data;
     string line;
     ifstream file;
     int B = 0;
     int L = 0;
     int D = 0;
+    vector<int> score_books;
+    vector<lib_data> libs;
 
-    file.open("../data/b_read_on.txt");
+    file.open("../data/a_example.txt");
 
     if (!file) {
         cout << "File not found";
@@ -25,23 +34,46 @@ int main() {
     int line_counter = 0;
 
     while (getline(file, line)) {
-        boost::split(books_libraries_days, line,  boost::is_any_of(" "));
-        switch (line_counter)
-        {
-        case 0:
-            B = stoi(books_libraries_days[0]);
-            L = stoi(books_libraries_days[1]);
-            D = stoi(books_libraries_days[2]);
+        boost::split(data, line,  boost::is_any_of(" "));
+        if(line_counter == 0){
+            B = stoi(data[0]);
+            L = stoi(data[1]);
+            D = stoi(data[2]);
             cout << "B: " << B << " L: " << L << " D: " << D << endl;
-            break;
-        case 1:
-
-            break;
         }
-
+        else{
+            if(line_counter == 1){
+                for(int i = 0; i < data.size(); i++){
+                    score_books.emplace_back(stoi(data[i]));
+                }
+                cout << "Score books" << endl;
+                for(int i = 0; i < score_books.size(); i++){
+                    cout << " " << score_books[i] << " ";
+                }
+                cout << endl;
+            }
+            else{
+                if(line_counter % 2 == 0){
+                    libs.emplace_back(lib_data{stoi(data[0]), stoi(data[1]), stoi(data[2])});
+                }
+                else {
+                    for(int i = 0; i < data.size(); i++){
+                        libs.back().lib_books.emplace_back(stoi(data[i]));
+                    }
+                }
+            }
+        }
+        
         line_counter++;
     }
-    
+    cout << "Libraries: " << endl;
+    for(int i = 0; i < libs.size(); i++){
+        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].ship_days << endl;
+        for(int j = 0; j < libs[i].lib_books.size(); j++){
+            cout << " " << libs[i].lib_books[j] << " ";
+        }
+        cout << endl;
+    }
     file.close();
     return 0;
 }
