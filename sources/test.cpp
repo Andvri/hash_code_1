@@ -15,6 +15,21 @@ struct lib_data {
     vector<int> books_to_scan;
 } typedef lib_data;
 
+lib_data lib_search(int& B, int&, int& D, vector<int>& score_books, vector<lib_data>& libs) {
+    int max_points = 0;
+    int current_points = 0;
+    int days_left = D;
+    int day_counter = 0;
+    int book_per_day_counter = 0;
+
+    for (unsigned i = 0; i < libs.size(); i++) {
+        days_left -= libs[i].signup;
+        for (unsigned j = 0; j < libs[i].lib_books.size(); j++) {
+            current_points += score_books[libs[i].lib_books[j]];
+        }
+    }
+}
+
 int main() {
     // Extract data:
     vector<string> data;
