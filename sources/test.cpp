@@ -58,8 +58,12 @@ int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
             }
         }
 
+        if(book_per_day_counter != 0){
+            day_counter++;
+        }
+
         if(j > 0)
-            current_points = days_left * libs[i].books_per_day * current_points / j;
+            current_points = current_points / (day_counter + libs[i].signup);
         else
             current_points = 0;
 
@@ -97,7 +101,7 @@ int main() {
     vector<book_data> books;
     vector<lib_data> libs;
 
-    file.open("../data/a_example.txt");
+    file.open("../data/d_tough_choices.txt");
 
     if (!file) {
         cout << "File not found";
@@ -154,13 +158,20 @@ int main() {
     }
     
     unsigned number_of_scanned_libs = scanned_libs_indices.size();
-   
+    
+    unsigned value = 0;
+    for(int i = 0; i < books.size(); i++){
+        if(books[i].marked){
+            value += books[i].score;
+        }
+    }
+    cout << "value: " << value << endl;
     // TODO 
 
     // Save results:
     ofstream result_file;
     string books_line = "";
-    result_file.open("../data/result_a.txt");
+    result_file.open("../data/result_d.txt");
     result_file << to_string(number_of_scanned_libs) + "\n";
     cout << "Number of libs to scan: " + to_string(number_of_scanned_libs) << endl;
     for (int i = 0; i < number_of_scanned_libs; i++) {
