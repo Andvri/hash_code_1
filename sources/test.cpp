@@ -15,19 +15,28 @@ struct lib_data {
     vector<int> books_to_scan;
 } typedef lib_data;
 
-int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs) {
+int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs, vector<int>& marked_books) {
     int max_points = 0;
     int best_library_index = -1;
     int current_points = 0;
     int days_left = D;
     int day_counter = 0;
     int book_per_day_counter = 0;
+    vector<int> marked_local_books;
+    vector<int> marked_max_books;
 
     for (unsigned i = 0; i < libs.size(); i++) {
         days_left -= libs[i].signup;
 
+        marked_local_books.clear();
         unsigned j = 0;
         for (; j < libs[i].lib_books.size(); j++) {
+            vector<int>::iterator it = find(marked_books.begin(), marked_books.end(), libs[i].lib_books[j]);
+            if(it != marked_books.end()){
+                continue;
+            }
+
+            marked_local_books.emplace_back(libs[i].lib_books[j]);
             current_points += score_books[libs[i].lib_books[j]];
             book_per_day_counter++;
 
@@ -44,6 +53,9 @@ int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs) {
         current_points = days_left * libs[i].books_per_day * current_points / j;
 
         if (current_points > max_points) {
+             for(int k = 0; k < marked_local_books.size(); k++){
+                marked_max_books.emplace_back(marked_local_books[k]);
+            }
             max_points = current_points;
             best_library_index = i;
         }
@@ -55,6 +67,10 @@ int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs) {
         days_left = D;
     }
 
+    for(int k = 0; k < marked_max_books.size(); k++){
+        libs[best_library_index].books_to_scan.emplace_back(marked_max_books[k]);
+        marked_books.emplace_back(marked_max_books[k]);
+    }
     cout << best_library_index << endl;
 
     return best_library_index;
@@ -70,6 +86,8 @@ int main() {
     int D = 0;
     vector<int> score_books;
     vector<lib_data> libs;
+    vector<lib_data> not_marked_libs;
+    vector<int> marked_books;
 
     file.open("../data/a_example.txt");
 
@@ -102,10 +120,12 @@ int main() {
             else{
                 if(line_counter % 2 == 0){
                     libs.emplace_back(lib_data{stoi(data[0]), stoi(data[1]), stoi(data[2])});
+                    not_marked_libs.emplace_back(lib_data{stoi(data[0]), stoi(data[1]), stoi(data[2])});
                 }
                 else {
                     for(unsigned i = 0; i < data.size(); i++){
                         libs.back().lib_books.emplace_back(stoi(data[i]));
+                        not_marked_libs.back().lib_books.emplace_back(stoi(data[i]));
                     }
                 }
             }
@@ -119,6 +139,9 @@ int main() {
         sort(libs[i].lib_books.begin(), libs[i].lib_books.end(), [&] (int book_a, int book_b) {
             return score_books[book_a] > score_books[book_b]; 
         });
+        sort(not_marked_libs[i].lib_books.begin(), not_marked_libs[i].lib_books.end(), [&] (int book_a, int book_b) {
+            return score_books[book_a] > score_books[book_b]; 
+        });
         for(unsigned j = 0; j < libs[i].lib_books.size(); j++){
             cout << " " << libs[i].lib_books[j] << " ";
         }
@@ -126,8 +149,13 @@ int main() {
     }
     file.close();
 
-    int best = lib_search(D, score_books, libs);
-
+    int best = lib_search(D, score_books, not_marked_libs, marked_books);
+    
+    cout << " Marked books " << endl;
+    for(int i = 0; i < marked_books.size(); i++){
+        cout << marked_books[i];
+    }
+    cout << endl;
     // Algorithm:    
     int number_of_scanned_libs = 0;
     int scanned_libs_indices[number_of_scanned_libs];
