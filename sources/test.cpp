@@ -6,6 +6,13 @@
 
 using namespace std;
 
+struct lib_data {
+    int lib_number_of_books;
+    int signup;
+    int ship_days;
+    vector<int> lib_books;
+} typedef lib_data;
+
 int main() {
     vector<string> books_libraries_days;
     string line;
