@@ -25,13 +25,20 @@ int main() {
     int line_counter = 0;
 
     while (getline(file, line)) {
-        if (line_counter == 0) {
-            boost::split(books_libraries_days, line,  boost::is_any_of(" "));
+        boost::split(books_libraries_days, line,  boost::is_any_of(" "));
+        switch (line_counter)
+        {
+        case 0:
             B = stoi(books_libraries_days[0]);
             L = stoi(books_libraries_days[1]);
             D = stoi(books_libraries_days[2]);
             cout << "B: " << B << " L: " << L << " D: " << D << endl;
+            break;
+        case 1:
+
+            break;
         }
+
         line_counter++;
     }
     
