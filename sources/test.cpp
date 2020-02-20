@@ -38,7 +38,12 @@ int main() {
             L = stoi(books_libraries_days[1]);
             D = stoi(books_libraries_days[2]);
             cout << "B: " << B << " L: " << L << " D: " << D << endl;
+            
+        } else if (line_counter == 1) {
+            
         }
+
+
         line_counter++;
     }
     
