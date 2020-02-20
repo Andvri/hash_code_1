@@ -25,14 +25,17 @@ int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs, vector<
     int book_per_day_counter = 0;
     vector<int> marked_local_books;
     vector<int> marked_max_books;
-
+    int j_max = -1;
+    string books_mark = "";
+    string books_max_mark = "";
+    
     for (unsigned i = 0; i < libs.size(); i++) {
         if(libs[i].marked){
             continue;
         }
         days_left -= libs[i].signup;
-
-        marked_local_books.clear();
+        books_mark = "";
+        //marked_local_books.clear();
         unsigned j = 0;
         for (; j < libs[i].lib_books.size(); j++) {
             vector<int>::iterator it = find(marked_books.begin(), marked_books.end(), libs[i].lib_books[j]);
@@ -40,7 +43,9 @@ int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs, vector<
                 continue;
             }
 
-            marked_local_books.emplace_back(libs[i].lib_books[j]);
+            books_mark += to_string(libs[i].lib_books[j]) + ",";
+
+          //  marked_local_books.emplace_back(libs[i].lib_books[j]);
             current_points += score_books[libs[i].lib_books[j]];
             book_per_day_counter++;
 
@@ -57,28 +62,31 @@ int lib_search(int& D, vector<int>& score_books, vector<lib_data>& libs, vector<
         current_points = days_left * libs[i].books_per_day * current_points / j;
 
         if (current_points > max_points) {
-             for(int k = 0; k < marked_local_books.size(); k++){
-                marked_max_books.emplace_back(marked_local_books[k]);
-            }
             max_points = current_points;
+            books_max_mark = books_mark;
             best_library_index = i;
+            j_max = j;
         }
-
-        cout << current_points << endl;
 
         current_points = 0;
         day_counter = 0;
         days_left = D;
     }
 
-    for(int k = 0; k < marked_max_books.size(); k++){
+   /* for(int k = 0; k < marked_max_books.size(); k++){
         libs[best_library_index].books_to_scan.emplace_back(marked_max_books[k]);
         marked_books.emplace_back(marked_max_books[k]);
+    }*/
+
+
+    vector<string> result;
+    boost::split(result, books_max_mark,  boost::is_any_of(","));
+    for(int k = 0; k < result.size() - 1; k++){
+       // cout << result[k];
+        libs[best_library_index].books_to_scan.emplace_back(stoi(result[k]));
+        marked_books.emplace_back(stoi(result[k]));
     }
-
     libs[best_library_index].marked = true;
-
-    cout << best_library_index << endl;
 
     return best_library_index;
 }
@@ -95,7 +103,7 @@ int main() {
     vector<lib_data> libs;
     vector<int> marked_books;
 
-    file.open("../data/a_example.txt");
+    file.open("../data/b_read_on.txt");
 
     if (!file) {
         cout << "File not found";
@@ -110,18 +118,18 @@ int main() {
             B = stoi(data[0]);
             L = stoi(data[1]);
             D = stoi(data[2]);
-            cout << "B: " << B << " L: " << L << " D: " << D << endl;
+          //  cout << "B: " << B << " L: " << L << " D: " << D << endl;
         }
         else{
             if(line_counter == 1){
                 for(unsigned i = 0; i < data.size(); i++){
                     score_books.emplace_back(stoi(data[i]));
                 }
-                cout << "Score books" << endl;
+                /*cout << "Score books" << endl;
                 for(unsigned i = 0; i < score_books.size(); i++){
                     cout << " " << score_books[i] << " ";
                 }
-                cout << endl;
+                cout << endl*/
             }
             else{
                 if(line_counter % 2 == 0){
@@ -137,16 +145,16 @@ int main() {
         
         line_counter++;
     }
-    cout << "Libraries: " << endl;
+    //cout << "Libraries: " << endl;
     for(unsigned i = 0; i < libs.size(); i++){
-        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].books_per_day << endl;
+       // cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].books_per_day << endl;
         sort(libs[i].lib_books.begin(), libs[i].lib_books.end(), [&] (int book_a, int book_b) {
             return score_books[book_a] > score_books[book_b]; 
         });
-        for(unsigned j = 0; j < libs[i].lib_books.size(); j++){
+       /* for(unsigned j = 0; j < libs[i].lib_books.size(); j++){
             cout << " " << libs[i].lib_books[j] << " ";
         }
-        cout << endl;
+        cout << endl;*/
     }
     file.close();
 
@@ -163,7 +171,7 @@ int main() {
     }
     
     unsigned number_of_scanned_libs = scanned_libs_indices.size();
-    cout << " Marked books " << endl;
+   /* cout << " Marked books " << endl;
     for(int i = 0; i < marked_books.size(); i++){
         cout << marked_books[i];
     }
@@ -177,7 +185,7 @@ int main() {
         }
         cout << endl;
     }
-    cout << endl;
+    cout << endl;*/
     // Algorithm:    
 
     // TODO 
