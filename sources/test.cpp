@@ -10,11 +10,13 @@ using namespace std;
 struct lib_data {
     int lib_number_of_books;
     int signup;
-    int ship_days;
+    int books_per_day;
     vector<int> lib_books;
+    vector<int> books_to_scan;
 } typedef lib_data;
 
 int main() {
+    // Extract data:
     vector<string> data;
     string line;
     ifstream file;
@@ -43,11 +45,11 @@ int main() {
         }
         else{
             if(line_counter == 1){
-                for(int i = 0; i < data.size(); i++){
+                for(unsigned i = 0; i < data.size(); i++){
                     score_books.emplace_back(stoi(data[i]));
                 }
                 cout << "Score books" << endl;
-                for(int i = 0; i < score_books.size(); i++){
+                for(unsigned i = 0; i < score_books.size(); i++){
                     cout << " " << score_books[i] << " ";
                 }
                 cout << endl;
@@ -57,7 +59,7 @@ int main() {
                     libs.emplace_back(lib_data{stoi(data[0]), stoi(data[1]), stoi(data[2])});
                 }
                 else {
-                    for(int i = 0; i < data.size(); i++){
+                    for(unsigned i = 0; i < data.size(); i++){
                         libs.back().lib_books.emplace_back(stoi(data[i]));
                     }
                 }
@@ -67,16 +69,42 @@ int main() {
         line_counter++;
     }
     cout << "Libraries: " << endl;
-    for(int i = 0; i < libs.size(); i++){
-        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].ship_days << endl;
-       /* sort(libs[i].lib_books.begin(), libs[i].lib_books.end(), [&] (int book_a, int book_b) {
-            return true; 
-        });*/
-        for(int j = 0; j < libs[i].lib_books.size(); j++){
+    for(unsigned i = 0; i < libs.size(); i++){
+        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].books_per_day << endl;
+        sort(libs[i].lib_books.begin(), libs[i].lib_books.end(), [&] (int book_a, int book_b) {
+            return score_books[book_a] > score_books[book_b]; 
+        });
+        for(unsigned j = 0; j < libs[i].lib_books.size(); j++){
             cout << " " << libs[i].lib_books[j] << " ";
         }
         cout << endl;
     }
     file.close();
+
+    // Algorithm:    
+    int number_of_scanned_libs = 0;
+    int scanned_libs_indices[number_of_scanned_libs];
+    // TODO 
+
+    // Save results:
+    ofstream result_file;
+    string books_line = "";
+    result_file.open("../data/result_a.txt");
+    result_file << to_string(number_of_scanned_libs) + "\n";
+    cout << "Number of libs to scan: " + to_string(number_of_scanned_libs) << endl;
+    for (int i = 0; i < number_of_scanned_libs; i++) {
+        result_file << to_string(scanned_libs_indices[i]) + " " + to_string(libs[scanned_libs_indices[i]].books_to_scan.size()) + "\n";
+        books_line = "";
+        for (unsigned j = 0; j < libs[scanned_libs_indices[i]].books_to_scan.size(); j++) {
+            books_line += to_string(libs[scanned_libs_indices[i]].books_to_scan[j]);
+            if (j < libs[scanned_libs_indices[i]].books_to_scan.size() - 1)
+                books_line += " ";
+            else if (j == libs[scanned_libs_indices[i]].books_to_scan.size() - 1)
+                books_line += "\n";
+        }
+        result_file << books_line;
+    }
+    result_file.close(); 
+
     return 0;
 }
