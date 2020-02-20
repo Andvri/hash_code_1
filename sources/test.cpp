@@ -85,7 +85,10 @@ int main() {
     }
     cout << "Libraries: " << endl;
     for(unsigned i = 0; i < libs.size(); i++){
-        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " books_per_day: " << libs[i].books_per_day << endl;
+        cout << "n_books: " << libs[i].lib_number_of_books << " signup: " << libs[i].signup << " ship_days: " << libs[i].books_per_day << endl;
+        sort(libs[i].lib_books.begin(), libs[i].lib_books.end(), [&] (int book_a, int book_b) {
+            return score_books[book_a] > score_books[book_b]; 
+        });
         for(unsigned j = 0; j < libs[i].lib_books.size(); j++){
             cout << " " << libs[i].lib_books[j] << " ";
         }
