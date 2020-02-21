@@ -36,6 +36,10 @@ int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
             continue;
         }
         days_left -= libs[i].signup;
+        if(days_left < 0){
+            days_left = D;
+            continue;
+        }
         books_mark = "";
         unsigned j = 0;
         for (; j < libs[i].lib_books.size(); j++) {
@@ -62,10 +66,7 @@ int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
             day_counter++;
         }
 
-        if(j > 0)
-            current_points = current_points / (day_counter + libs[i].signup);
-        else
-            current_points = 0;
+        current_points = (days_left + 1) * current_points / (day_counter + libs[i].signup);
 
         if (current_points > max_points) {
             max_points = current_points;
@@ -78,13 +79,26 @@ int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
         days_left = D;
     }
 
+    days_left = D - libs[best_library_index].signup;
+    book_per_day_counter = 0;
+    
     vector<string> result;
     boost::split(result, books_max_mark,  boost::is_any_of(","));
     for(int k = 0; k < result.size() - 1; k++){
        int value = libs[best_library_index].lib_books[stoi(result[k])];
         libs[best_library_index].books_to_scan.emplace_back(value);
         books[value].marked = true;
+        
+        book_per_day_counter++;
+        if (book_per_day_counter == libs[best_library_index].books_per_day) {
+            days_left--;
+            book_per_day_counter = 0;
+            if(days_left <= 0){
+                break;
+            }
+        }
     }
+
     libs[best_library_index].marked = true;
 
     return best_library_index;
@@ -146,7 +160,7 @@ int main() {
     file.close();
 
     vector<int> scanned_libs_indices;
-
+    int D_aux = D;
     while(D > 0 && scanned_libs_indices.size() < libs.size()) {
         int best = lib_search(D, books, libs);
         if(best == -1){
@@ -160,12 +174,34 @@ int main() {
     unsigned number_of_scanned_libs = scanned_libs_indices.size();
     
     unsigned value = 0;
+    unsigned max_value = 0;
     for(int i = 0; i < books.size(); i++){
         if(books[i].marked){
             value += books[i].score;
         }
+        max_value += books[i].score;
     }
+   /* for (int i = 0; i < number_of_scanned_libs; i++) {
+        int d_books = 0;
+        int books_marked = 0;
+        D_aux -= libs[scanned_libs_indices[i]].signup;
+        for (unsigned j = 0; j < libs[scanned_libs_indices[i]].books_to_scan.size(); j++) {
+            value += books[libs[scanned_libs_indices[i]].books_to_scan[j]].score;
+            books_marked++;
+            if(books_marked == libs[scanned_libs_indices[i]].books_per_day){
+                books_marked = 0;
+                d_books++;
+            }
+        }
+        if(books_marked != 0){
+            d_books++;
+        }
+        cout << "libs: " << (scanned_libs_indices[i]*2 + 3) << endl;
+        cout << "D: " << D_aux << endl;
+        cout << "d_books : " << d_books << endl;
+    }*/
     cout << "value: " << value << endl;
+    cout << "max_value: " << max_value << endl;
     // TODO 
 
     // Save results:
