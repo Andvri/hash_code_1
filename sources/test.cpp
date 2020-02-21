@@ -22,9 +22,10 @@ struct book_data {
 } typedef book_data;
 
 int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
-    int max_points = 0;
+    double max_points = 0.;
+    double epsilon = 1E-6;
     int best_library_index = -1;
-    int current_points = 0;
+    double current_points = 0.;
     int days_left = D;
     int day_counter = 0;
     int book_per_day_counter = 0;
@@ -66,15 +67,15 @@ int lib_search(int& D, vector<book_data>& books, vector<lib_data>& libs) {
             day_counter++;
         }
 
-        current_points = (days_left + 1) * current_points / (day_counter + libs[i].signup);
+        current_points = (days_left + 1) * current_points / (double)(libs[i].signup);
 
-        if (current_points > max_points) {
+        if (current_points > max_points + epsilon) {
             max_points = current_points;
             books_max_mark = books_mark;
             best_library_index = i;
         }
 
-        current_points = 0;
+        current_points = 0.;
         day_counter = 0;
         days_left = D;
     }
@@ -181,25 +182,6 @@ int main() {
         }
         max_value += books[i].score;
     }
-   /* for (int i = 0; i < number_of_scanned_libs; i++) {
-        int d_books = 0;
-        int books_marked = 0;
-        D_aux -= libs[scanned_libs_indices[i]].signup;
-        for (unsigned j = 0; j < libs[scanned_libs_indices[i]].books_to_scan.size(); j++) {
-            value += books[libs[scanned_libs_indices[i]].books_to_scan[j]].score;
-            books_marked++;
-            if(books_marked == libs[scanned_libs_indices[i]].books_per_day){
-                books_marked = 0;
-                d_books++;
-            }
-        }
-        if(books_marked != 0){
-            d_books++;
-        }
-        cout << "libs: " << (scanned_libs_indices[i]*2 + 3) << endl;
-        cout << "D: " << D_aux << endl;
-        cout << "d_books : " << d_books << endl;
-    }*/
     cout << "value: " << value << endl;
     cout << "max_value: " << max_value << endl;
     // TODO 
